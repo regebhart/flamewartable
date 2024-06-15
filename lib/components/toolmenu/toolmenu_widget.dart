@@ -22,7 +22,7 @@ class _ToolMenuWidgetState extends State<ToolMenuWidget> {
 
     return BlocBuilder<ToolMenuBloc, String>(builder: (context, tool) {
       return Padding(
-        padding: const EdgeInsets.only(top: 10.0, left: 10),
+        padding: const EdgeInsets.only(top: 30.0, left: 10),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [

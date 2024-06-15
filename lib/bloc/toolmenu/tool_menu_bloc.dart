@@ -9,7 +9,7 @@ final class ToolSelected extends ToolSelectedEvent {
 }
 
 class ToolMenuBloc extends Bloc<ToolSelectedEvent, String> {
-  ToolMenuBloc() : super('pan') {
+  ToolMenuBloc() : super('select') {
     on<ToolSelected>((event, emit) => emit(event.tool));
   }
 }

@@ -26,6 +26,7 @@ class GamePieceComponent extends SpriteComponent with TapCallbacks, DragCallback
 
   List<GamePieceComponent> collisions = [];
   late ShapeHitbox hitbox;
+  late RectangleComponent border;
   final _collisionColor = Colors.red;
   final _selectedColor = Colors.green;
   final _defaultColor = Colors.transparent;
@@ -50,6 +51,20 @@ class GamePieceComponent extends SpriteComponent with TapCallbacks, DragCallback
 
     add(hitbox);
 
+    final Paint tokenborder = Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1.0
+      ..color = _defaultColor;
+
+    border = RectangleComponent.square(
+      anchor: Anchor.center,
+      size: 60,
+      position: Vector2(30, 30),
+      paint: tokenborder,
+    );
+
+    add(border);
+
     add(FlameMultiBlocProvider(
       providers: [
         FlameBlocProvider<ToolMenuBloc, String>.value(value: toolMenuBloc),
@@ -60,6 +75,15 @@ class GamePieceComponent extends SpriteComponent with TapCallbacks, DragCallback
           onNewState: (state) => toolSelected = state,
           onInitialState: (state) => toolSelected = state,
         ),
+        FlameBlocListener<GamePieceBloc, GamePieceState>(onNewState: (state) {
+          var index = state.tokens.indexWhere(
+            (element) => element.spriteComponent == this,
+          );
+          if (index != -1) {
+            print('found game piece');
+            setSelected(state.tokens[index].selected);
+          }
+        }),
       ],
     ));
 
@@ -122,19 +146,23 @@ class GamePieceComponent extends SpriteComponent with TapCallbacks, DragCallback
   @override
   void onTapUp(TapUpEvent event) {
     if (toolSelected == 'select') {
-      _selected = !_selected;
-      hitbox.paint.color = _selected
-          ? _selectedColor
-          : collisions.isEmpty
-              ? _defaultColor
-              : _collisionColor;
+      gamePieceBloc.add(GamePieceSelected(piece: this, selected: !_selected));
     }
-    print('gamepiece tapped');
     super.onTapUp(event);
   }
 
   void cancelSelect() {
-    _selected = false;
+    setSelected(false);
+    if (collisions.isEmpty) {
+      hitbox.paint.color = _defaultColor;
+    } else {
+      hitbox.paint.color = _collisionColor;
+    }
+  }
+
+  void setSelected(bool value) {
+    _selected = value;
+    border.setColor(_selected ? Colors.black : _defaultColor);
     if (collisions.isEmpty) {
       hitbox.paint.color = _defaultColor;
     } else {

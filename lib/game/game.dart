@@ -1,6 +1,7 @@
 import 'package:flame/components.dart';
 import 'package:flame/events.dart';
 import 'package:flame/experimental.dart';
+import 'package:flame/extensions.dart';
 import 'package:flame/game.dart';
 import 'package:flame_bloc/flame_bloc.dart';
 import 'package:flutter/material.dart';
@@ -10,24 +11,30 @@ import '../bloc/toolmenu/tool_menu_bloc.dart';
 import '../components/table.dart';
 
 class WartableGame extends FlameGame with ScrollDetector, ScaleDetector, PanDetector, DragCallbacks, HasCollisionDetection {
-  WartableGame({required this.toolMenuBloc, required this.gamePieceBloc})
-      : super(camera: CameraComponent.withFixedResolution(width: 1000, height: 1000));
+  WartableGame({required this.toolMenuBloc, required this.gamePieceBloc});
 
   final ToolMenuBloc toolMenuBloc;
   final GamePieceBloc gamePieceBloc;
 
-  String toolSelected = 'pan';
+  String toolSelected = 'select';
 
   Vector2 cameraPosition = Vector2.zero();
+  late RectangleComponent selectBoxComponent;
+  late Vector2 startpos;
+  late Vector2 endpos;
+  Vector2 compStartPos = Vector2.zero();
+  Vector2 compEndPos = Vector2.zero();
 
   @override
   Color backgroundColor() => Colors.grey.shade700;
 
   @override
   Future<void> onLoad() async {
-    world.add(GameTable());
+    add(FpsTextComponent());
+    world.add(GameTable(gamePieceBloc: gamePieceBloc));
     camera.viewfinder.position = Vector2(0, 0);
-    camera.viewfinder.anchor = Anchor.center;
+    // camera.viewfinder.anchor = Anchor.center;
+    camera.viewfinder.zoom = 1;
 
     camera.setBounds(Rectangle.fromCenter(center: Vector2.zero(), size: Vector2.all(650)));
 
@@ -43,7 +50,7 @@ class WartableGame extends FlameGame with ScrollDetector, ScaleDetector, PanDete
         ),
         FlameBlocListener<GamePieceBloc, GamePieceState>(
           onNewState: (state) async {
-            world.add(state.tokens.last.spriteComponent);            
+            world.add(state.tokens.last.spriteComponent);
           },
         ),
       ],
@@ -65,6 +72,27 @@ class WartableGame extends FlameGame with ScrollDetector, ScaleDetector, PanDete
   @override
   void onDragStart(DragStartEvent event) {
     super.onDragStart(event);
+    final delta = event.localPosition;
+    // selectBox = SelectBox(xstart: delta.x, ystart: delta.y, height: 0, width: 0);
+    switch (toolSelected) {
+      case 'select':
+        final Vector2 gamesize = size / 2;
+        final zoom = camera.viewfinder.zoom;
+        startpos = (delta - gamesize) / zoom;
+        endpos = delta;
+        selectBoxComponent = RectangleComponent.fromRect(
+          Rect.fromLTWH(delta.x - gamesize.x, delta.y - gamesize.y, 0, 0),
+          paint: Paint()
+            ..style = PaintingStyle.stroke
+            ..strokeWidth = 2.0
+            ..color = Colors.black,
+        );
+        // print('x: ${delta.x - gamesize.x} y: ${delta.y - gamesize.y}');
+        break;
+      default:
+        break;
+    }
+    world.add(selectBoxComponent);
   }
 
   @override
@@ -76,9 +104,48 @@ class WartableGame extends FlameGame with ScrollDetector, ScaleDetector, PanDete
         cameraPosition.add(-delta);
         camera.viewfinder.position = cameraPosition;
         break;
+      case 'select':
+        final Vector2 gamesize = size / 2;
+        final zoom = camera.viewfinder.zoom;
+
+        endpos = (event.localEndPosition - gamesize) / zoom;
+        selectBoxComponent.x = startpos.x;
+        selectBoxComponent.y = startpos.y;
+
+        double width = endpos.x - startpos.x;
+        double height = endpos.y - startpos.y;
+
+        if (startpos.x > endpos.x) {
+          selectBoxComponent.x = endpos.x;
+          width = startpos.x - endpos.x;
+        }
+        if (startpos.y > endpos.y) {
+          selectBoxComponent.y = endpos.y;
+          height = startpos.y - endpos.y;
+        }
+
+        selectBoxComponent.width = width;
+        selectBoxComponent.height = height;
+
+        compStartPos.x = selectBoxComponent.x;
+        compStartPos.y = selectBoxComponent.y;
+        compEndPos.x = selectBoxComponent.x + selectBoxComponent.width;
+        compEndPos.y = selectBoxComponent.y + selectBoxComponent.height;
       default:
         break;
     }
     super.onDragUpdate(event);
+  }
+
+  @override
+  void onDragEnd(DragEndEvent event) {
+    switch (toolSelected) {
+      case 'select':
+        gamePieceBloc.add(SelectGamePiecesInArea(area: Rect.fromPoints(compStartPos.toOffset(), compEndPos.toOffset())));
+        world.remove(selectBoxComponent);
+      default:
+        break;
+    }
+    super.onDragEnd(event);
   }
 }

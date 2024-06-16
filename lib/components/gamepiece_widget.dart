@@ -25,7 +25,6 @@ class GamePieceComponent extends SpriteComponent with TapCallbacks, DragCallback
   late ShapeHitbox hitbox;
   late RectangleComponent border;
   final _collisionColor = Colors.red;
-  final _selectedColor = Colors.green;
   final _defaultColor = Colors.transparent;
 
   String toolSelected = '';
@@ -127,9 +126,6 @@ class GamePieceComponent extends SpriteComponent with TapCallbacks, DragCallback
     if (other is GamePieceComponent) {
       collisions.add(other);
       hitbox.paint.color = _collisionColor;
-      if (_selected) {
-        hitbox.paint.color = _selectedColor;
-      }
     }
   }
 

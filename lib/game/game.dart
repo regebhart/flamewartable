@@ -73,6 +73,7 @@ class WartableGame extends FlameGame with ScrollDetector, ScaleDetector, PanDete
   void onDragStart(DragStartEvent event) {
     super.onDragStart(event);
     final delta = event.localPosition;
+    
     switch (toolSelected) {
       case 'select':
         final Vector2 gamesize = size / 2;

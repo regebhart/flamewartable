@@ -1,8 +1,10 @@
 import 'dart:async';
+import 'dart:math';
 
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 import 'package:flame/events.dart';
+import 'package:flame/extensions.dart';
 import 'package:flame_bloc/flame_bloc.dart';
 import 'package:flamewartable/bloc/gamepiece/gamepiece_bloc.dart';
 import 'package:flamewartable/bloc/toolmenu/tool_menu_bloc.dart';
@@ -13,6 +15,10 @@ import '../game/game.dart';
 class GamePieceComponent extends SpriteComponent with TapCallbacks, DragCallbacks, CollisionCallbacks, HasGameReference<WartableGame> {
   GamePieceComponent({required this.spriteImage, required this.toolMenuBloc, required this.gamePieceBloc})
       : super(size: Vector2.all(30), anchor: Anchor.center); //String owner, double size)
+
+  @override
+  // TODO: implement debugMode
+  bool get debugMode => super.debugMode;
 
   final String spriteImage;
   final ToolMenuBloc toolMenuBloc;
@@ -38,7 +44,7 @@ class GamePieceComponent extends SpriteComponent with TapCallbacks, DragCallback
       ..style = PaintingStyle.fill;
 
     hitbox = CircleHitbox(
-      radius: (width / 2) - (width * 0.024),
+      radius: (width / 2) - 0.01, // - (width * 0.024),
       anchor: Anchor.center,
       position: Vector2(width / 2, width / 2),
     )
@@ -117,6 +123,22 @@ class GamePieceComponent extends SpriteComponent with TapCallbacks, DragCallback
     if (!_isdragging) {
       return;
     }
+    for (var t in collisions) {
+      final double mindistance = (width / 2) + (t.width / 2);
+      final double tDistance = distance(t);
+      if (tDistance < mindistance) {
+        //angle of two points, then point that is from t center at angle n to min distance
+        Vector2 newpos = position + event.localDelta;
+        double n = t.angleTo(newpos);
+        double adj = mindistance * cos(n);
+        double opp = mindistance * sin(n);
+        position = Vector2(t.x + opp, t.y - adj);
+        return;
+      } else if (tDistance > mindistance + 5) {
+        print('removed');
+        collisions.remove(t);
+      }
+    }
     position += event.localDelta;
   }
 
@@ -125,7 +147,7 @@ class GamePieceComponent extends SpriteComponent with TapCallbacks, DragCallback
     super.onCollisionStart(intersectionPoints, other);
     if (other is GamePieceComponent) {
       collisions.add(other);
-      hitbox.paint.color = _collisionColor;
+      // hitbox.paint.color = _collisionColor;
     }
   }
 
@@ -133,10 +155,10 @@ class GamePieceComponent extends SpriteComponent with TapCallbacks, DragCallback
   void onCollisionEnd(PositionComponent other) {
     super.onCollisionEnd(other);
     if (other is GamePieceComponent) {
-      collisions.remove(other);
+      // collisions.remove(other);
     }
     if (collisions.isEmpty) {
-      hitbox.paint.color = _defaultColor;
+      // hitbox.paint.color = _defaultColor;
     }
   }
 
@@ -153,7 +175,7 @@ class GamePieceComponent extends SpriteComponent with TapCallbacks, DragCallback
     if (collisions.isEmpty) {
       hitbox.paint.color = _defaultColor;
     } else {
-      hitbox.paint.color = _collisionColor;
+      // hitbox.paint.color = _collisionColor;
     }
   }
 
@@ -163,7 +185,7 @@ class GamePieceComponent extends SpriteComponent with TapCallbacks, DragCallback
     if (collisions.isEmpty) {
       hitbox.paint.color = _defaultColor;
     } else {
-      hitbox.paint.color = _collisionColor;
+      // hitbox.paint.color = _collisionColor;
     }
   }
 }

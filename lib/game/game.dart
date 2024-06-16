@@ -73,7 +73,6 @@ class WartableGame extends FlameGame with ScrollDetector, ScaleDetector, PanDete
   void onDragStart(DragStartEvent event) {
     super.onDragStart(event);
     final delta = event.localPosition;
-    // selectBox = SelectBox(xstart: delta.x, ystart: delta.y, height: 0, width: 0);
     switch (toolSelected) {
       case 'select':
         final Vector2 gamesize = size / 2;
@@ -87,12 +86,11 @@ class WartableGame extends FlameGame with ScrollDetector, ScaleDetector, PanDete
             ..strokeWidth = 2.0
             ..color = Colors.black,
         );
-        // print('x: ${delta.x - gamesize.x} y: ${delta.y - gamesize.y}');
+        world.add(selectBoxComponent);
         break;
       default:
         break;
     }
-    world.add(selectBoxComponent);
   }
 
   @override
@@ -142,7 +140,10 @@ class WartableGame extends FlameGame with ScrollDetector, ScaleDetector, PanDete
     switch (toolSelected) {
       case 'select':
         gamePieceBloc.add(SelectGamePiecesInArea(area: Rect.fromPoints(compStartPos.toOffset(), compEndPos.toOffset())));
+        startpos = Vector2.zero();
+        endpos = startpos;
         world.remove(selectBoxComponent);
+
       default:
         break;
     }

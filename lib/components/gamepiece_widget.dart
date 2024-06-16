@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:ui';
 
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
@@ -12,8 +11,6 @@ import 'package:flutter/material.dart';
 import '../game/game.dart';
 
 class GamePieceComponent extends SpriteComponent with TapCallbacks, DragCallbacks, CollisionCallbacks, HasGameReference<WartableGame> {
-  @override
-  bool debugMode = false;
   GamePieceComponent({required this.spriteImage, required this.toolMenuBloc, required this.gamePieceBloc})
       : super(size: Vector2.all(30), anchor: Anchor.center); //String owner, double size)
 
@@ -42,24 +39,30 @@ class GamePieceComponent extends SpriteComponent with TapCallbacks, DragCallback
       ..style = PaintingStyle.fill;
 
     hitbox = CircleHitbox(
-      radius: 29.9,
+      radius: (width / 2) - (width * 0.024),
       anchor: Anchor.center,
-      position: Vector2(30, 30),
+      position: Vector2(width / 2, width / 2),
     )
       ..paint = defaultPaint
       ..renderShape = true;
 
     add(hitbox);
-
+    add(TextComponent(
+        text: width.toString(),
+        anchor: Anchor.center,
+        position: Vector2(width / 2, height / 2),
+        textRenderer: TextPaint(
+          style: const TextStyle(fontSize: 20, color: Colors.white),
+        )));
     final Paint tokenborder = Paint()
       ..style = PaintingStyle.stroke
-      ..strokeWidth = 1.0
+      ..strokeWidth = 2.0
       ..color = _defaultColor;
 
     border = RectangleComponent.square(
       anchor: Anchor.center,
-      size: 60,
-      position: Vector2(30, 30),
+      size: width,
+      position: Vector2(width / 2, width / 2),
       paint: tokenborder,
     );
 
@@ -80,7 +83,6 @@ class GamePieceComponent extends SpriteComponent with TapCallbacks, DragCallback
             (element) => element.spriteComponent == this,
           );
           if (index != -1) {
-            print('found game piece');
             setSelected(state.tokens[index].selected);
           }
         }),
@@ -101,13 +103,12 @@ class GamePieceComponent extends SpriteComponent with TapCallbacks, DragCallback
     super.onDragStart(event);
     priority = 100;
     _isdragging = true;
-    print('dragging piece true');
   }
 
   @override
   void onDragEnd(DragEndEvent event) {
     _isdragging = false;
-    // priority = 1;
+    priority = 1;
     super.onDragEnd(event);
   }
 
@@ -168,10 +169,5 @@ class GamePieceComponent extends SpriteComponent with TapCallbacks, DragCallback
     } else {
       hitbox.paint.color = _collisionColor;
     }
-  }
-
-  @override
-  void render(Canvas canvas) {
-    super.render(canvas);
   }
 }

@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flame/components.dart';
 import 'package:flamewartable/bloc/gamepiece/gamepiece_bloc.dart';
 import 'package:flamewartable/components/gamepiece_widget.dart';
@@ -6,6 +8,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../bloc/toolmenu/tool_menu_bloc.dart';
+
+List<double> sizes = [30, 40, 50, 80, 120];
 
 class ToolMenuWidget extends StatefulWidget {
   const ToolMenuWidget({super.key});
@@ -22,7 +26,7 @@ class _ToolMenuWidgetState extends State<ToolMenuWidget> {
 
     return BlocBuilder<ToolMenuBloc, String>(builder: (context, tool) {
       return Padding(
-        padding: const EdgeInsets.only(top: 30.0, left: 10),
+        padding: const EdgeInsets.only(top: 30.0, left: 10, bottom: 5.0),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -75,6 +79,8 @@ class _ToolMenuWidgetState extends State<ToolMenuWidget> {
               padding: const EdgeInsets.symmetric(vertical: 5.0),
               child: GestureDetector(
                 onTap: () {
+                  int randomIndex = Random().nextInt(sizes.length);
+                  
                   gamePieces.add(AddGamePiece(
                     piece: GamePiece(
                         selected: false,
@@ -85,8 +91,8 @@ class _ToolMenuWidgetState extends State<ToolMenuWidget> {
                           gamePieceBloc: gamePieces,
                         )
                           ..priority = 50
-                          ..width = 60
-                          ..height = 60
+                          ..width = sizes[randomIndex]
+                          ..height = sizes[randomIndex]
                           ..position = Vector2(60, 60)
                           ..anchor = Anchor.center),
                   ));

@@ -1,11 +1,14 @@
 import 'package:flamewartable/bloc/gamepiece/gamepiece_bloc.dart';
 import 'package:flamewartable/bloc/toolmenu/tool_menu_bloc.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'game/game_window.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await BrowserContextMenu.disableContextMenu();
   runApp(const MyApp());
 }
 

@@ -10,7 +10,7 @@ import '../bloc/gamepiece/gamepiece_bloc.dart';
 import '../bloc/toolmenu/tool_menu_bloc.dart';
 import '../components/table.dart';
 
-class WartableGame extends FlameGame with ScrollDetector, ScaleDetector, PanDetector, DragCallbacks, HasCollisionDetection {
+class WartableGame extends FlameGame with ScrollDetector, DragCallbacks {
   WartableGame({required this.toolMenuBloc, required this.gamePieceBloc});
 
   final ToolMenuBloc toolMenuBloc;
@@ -73,7 +73,7 @@ class WartableGame extends FlameGame with ScrollDetector, ScaleDetector, PanDete
   void onDragStart(DragStartEvent event) {
     super.onDragStart(event);
     final delta = event.localPosition;
-    
+
     switch (toolSelected) {
       case 'select':
         final Vector2 gamesize = size / 2;
@@ -134,6 +134,12 @@ class WartableGame extends FlameGame with ScrollDetector, ScaleDetector, PanDete
         break;
     }
     super.onDragUpdate(event);
+  }
+
+  void onSecondaryButtonDragUpdate(DragUpdateDetails details) {
+    final delta = (details.delta * 1.1).toVector2();
+    cameraPosition.add(-delta);
+    camera.viewfinder.position = cameraPosition;
   }
 
   @override

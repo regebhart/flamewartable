@@ -4,7 +4,6 @@ import 'dart:math';
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 import 'package:flame/events.dart';
-import 'package:flame/extensions.dart';
 import 'package:flame_bloc/flame_bloc.dart';
 import 'package:flamewartable/bloc/gamepiece/gamepiece_bloc.dart';
 import 'package:flamewartable/bloc/toolmenu/tool_menu_bloc.dart';
@@ -16,10 +15,6 @@ class GamePieceComponent extends SpriteComponent with TapCallbacks, DragCallback
   GamePieceComponent({required this.spriteImage, required this.toolMenuBloc, required this.gamePieceBloc})
       : super(size: Vector2.all(30), anchor: Anchor.center); //String owner, double size)
 
-  @override
-  // TODO: implement debugMode
-  bool get debugMode => super.debugMode;
-
   final String spriteImage;
   final ToolMenuBloc toolMenuBloc;
   final GamePieceBloc gamePieceBloc;
@@ -30,7 +25,7 @@ class GamePieceComponent extends SpriteComponent with TapCallbacks, DragCallback
   List<GamePieceComponent> collisions = [];
   late ShapeHitbox hitbox;
   late RectangleComponent border;
-  final _collisionColor = Colors.red;
+  // final _collisionColor = Colors.red;
   final _defaultColor = Colors.transparent;
 
   String toolSelected = '';

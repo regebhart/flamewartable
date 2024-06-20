@@ -10,8 +10,8 @@ class GameTable extends SpriteComponent with TapCallbacks, HasGameReference<Wart
 
   final GamePieceBloc gamePieceBloc;
 
-  @override
-  bool debugMode = true;
+  // @override
+  // bool debugMode = true;
 
   @override
   Future<void> onLoad() async {

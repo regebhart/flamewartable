@@ -139,6 +139,7 @@ class GamePieceComponent extends SpriteComponent with TapCallbacks, DragCallback
   @override
   void onCollisionStart(Set<Vector2> intersectionPoints, PositionComponent other) {
     super.onCollisionStart(intersectionPoints, other);
+    print('start');
     if (other is GamePieceComponent) {
       collisions.add(other);
       // hitbox.paint.color = _collisionColor;

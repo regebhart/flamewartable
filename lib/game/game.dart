@@ -10,14 +10,14 @@ import '../bloc/gamepiece/gamepiece_bloc.dart';
 import '../bloc/toolmenu/tool_menu_bloc.dart';
 import '../components/table.dart';
 
-class WartableGame extends FlameGame with ScrollDetector, DragCallbacks {
+class WartableGame extends FlameGame with ScrollDetector, DragCallbacks, HasCollisionDetection {
   WartableGame({required this.toolMenuBloc, required this.gamePieceBloc});
 
   final ToolMenuBloc toolMenuBloc;
   final GamePieceBloc gamePieceBloc;
 
-  @override
-  bool debugMode = true;
+  // @override
+  // bool debugMode = true;
 
   String toolSelected = 'select';
 

@@ -79,9 +79,10 @@ class WartableGame extends FlameGame with ScrollDetector, DragCallbacks {
 
     switch (toolSelected) {
       case 'select':
+        final zoom = camera.viewfinder.zoom;
         final Vector2 cameraTopLeft =
             Vector2(camera.viewfinder.position.x - (camera.viewport.size.x / 2), camera.viewfinder.position.y - (camera.viewport.size.y / 2));
-        startpos = (delta + cameraTopLeft);
+        startpos = (delta + cameraTopLeft) / zoom;
         endpos = startpos;
         selectBoxComponent = RectangleComponent.fromRect(
           Rect.fromLTWH(startpos.x, startpos.y, 0, 0),
@@ -107,9 +108,10 @@ class WartableGame extends FlameGame with ScrollDetector, DragCallbacks {
         camera.viewfinder.position = cameraPosition;
         break;
       case 'select':
+        final zoom = camera.viewfinder.zoom;
         final Vector2 cameraTopLeft =
             Vector2(camera.viewfinder.position.x - (camera.viewport.size.x / 2), camera.viewfinder.position.y - (camera.viewport.size.y / 2));
-        endpos = (event.localEndPosition + cameraTopLeft);
+        endpos = (event.localEndPosition + cameraTopLeft) / zoom;
         selectBoxComponent.x = startpos.x;
         selectBoxComponent.y = startpos.y;
 

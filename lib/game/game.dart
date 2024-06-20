@@ -16,6 +16,9 @@ class WartableGame extends FlameGame with ScrollDetector, DragCallbacks {
   final ToolMenuBloc toolMenuBloc;
   final GamePieceBloc gamePieceBloc;
 
+  @override
+  bool debugMode = true;
+
   String toolSelected = 'select';
 
   Vector2 cameraPosition = Vector2.zero();
@@ -33,7 +36,7 @@ class WartableGame extends FlameGame with ScrollDetector, DragCallbacks {
     add(FpsTextComponent());
     world.add(GameTable(gamePieceBloc: gamePieceBloc));
     camera.viewfinder.position = Vector2(0, 0);
-    // camera.viewfinder.anchor = Anchor.center;
+    camera.viewfinder.anchor = Anchor.center;
     camera.viewfinder.zoom = 1;
 
     camera.setBounds(Rectangle.fromCenter(center: Vector2.zero(), size: Vector2.all(650)));
@@ -72,16 +75,16 @@ class WartableGame extends FlameGame with ScrollDetector, DragCallbacks {
   @override
   void onDragStart(DragStartEvent event) {
     super.onDragStart(event);
-    final delta = event.localPosition;
+    final delta = event.devicePosition;
 
     switch (toolSelected) {
       case 'select':
-        final Vector2 gamesize = size / 2;
-        final zoom = camera.viewfinder.zoom;
-        startpos = (delta - gamesize) / zoom;
-        endpos = delta;
+        final Vector2 cameraTopLeft =
+            Vector2(camera.viewfinder.position.x - (camera.viewport.size.x / 2), camera.viewfinder.position.y - (camera.viewport.size.y / 2));
+        startpos = (delta + cameraTopLeft);
+        endpos = startpos;
         selectBoxComponent = RectangleComponent.fromRect(
-          Rect.fromLTWH(delta.x - gamesize.x, delta.y - gamesize.y, 0, 0),
+          Rect.fromLTWH(startpos.x, startpos.y, 0, 0),
           paint: Paint()
             ..style = PaintingStyle.stroke
             ..strokeWidth = 2.0
@@ -104,10 +107,9 @@ class WartableGame extends FlameGame with ScrollDetector, DragCallbacks {
         camera.viewfinder.position = cameraPosition;
         break;
       case 'select':
-        final Vector2 gamesize = size / 2;
-        final zoom = camera.viewfinder.zoom;
-
-        endpos = (event.localEndPosition - gamesize) / zoom;
+        final Vector2 cameraTopLeft =
+            Vector2(camera.viewfinder.position.x - (camera.viewport.size.x / 2), camera.viewfinder.position.y - (camera.viewport.size.y / 2));
+        endpos = (event.localEndPosition + cameraTopLeft);
         selectBoxComponent.x = startpos.x;
         selectBoxComponent.y = startpos.y;
 
@@ -136,12 +138,6 @@ class WartableGame extends FlameGame with ScrollDetector, DragCallbacks {
     super.onDragUpdate(event);
   }
 
-  void onSecondaryButtonDragUpdate(DragUpdateDetails details) {
-    final delta = (details.delta * 1.1).toVector2();
-    cameraPosition.add(-delta);
-    camera.viewfinder.position = cameraPosition;
-  }
-
   @override
   void onDragEnd(DragEndEvent event) {
     switch (toolSelected) {
@@ -155,5 +151,20 @@ class WartableGame extends FlameGame with ScrollDetector, DragCallbacks {
         break;
     }
     super.onDragEnd(event);
+  }
+
+  void onSecondaryButtonDragUpdate(DragUpdateDetails details) {
+    final delta = (details.delta * 1.1).toVector2();
+    cameraPosition.add(-delta);
+    camera.viewfinder.position = cameraPosition;
+  }
+
+  void moveCamera(Vector2 delta) {
+    delta = delta * 1.1;
+    final cameraPosition = camera.viewfinder.position;
+    final Vector2 gamesize = size / 2;
+    cameraPosition.add(-delta);
+    cameraPosition.clamp(gamesize * -1, gamesize);
+    camera.viewfinder.position = cameraPosition;
   }
 }

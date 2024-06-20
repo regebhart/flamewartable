@@ -11,6 +11,9 @@ class GameTable extends SpriteComponent with TapCallbacks, HasGameReference<Wart
   final GamePieceBloc gamePieceBloc;
 
   @override
+  bool debugMode = true;
+
+  @override
   Future<void> onLoad() async {
     sprite = await game.loadSprite('landscape.png');
     size = Vector2(1219.2, 1219.2);

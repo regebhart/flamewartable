@@ -130,7 +130,6 @@ class GamePieceComponent extends SpriteComponent with TapCallbacks, DragCallback
         position = Vector2(t.x + opp, t.y - adj);
         return;
       } else if (tDistance > mindistance + 5) {
-        print('removed');
         collisions.remove(t);
       }
     }

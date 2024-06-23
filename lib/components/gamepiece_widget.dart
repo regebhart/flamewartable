@@ -11,7 +11,7 @@ import 'package:flutter/material.dart';
 
 import '../game/game.dart';
 
-class GamePieceComponent extends SpriteComponent with TapCallbacks, DragCallbacks, CollisionCallbacks, HasGameReference<WartableGame> {
+class GamePieceComponent extends SpriteComponent with TapCallbacks, DragCallbacks, HasGameReference<WartableGame> {
   GamePieceComponent({required this.spriteImage, required this.toolMenuBloc, required this.gamePieceBloc})
       : super(size: Vector2.all(30), anchor: Anchor.center); //String owner, double size)
 
@@ -23,6 +23,7 @@ class GamePieceComponent extends SpriteComponent with TapCallbacks, DragCallback
   bool _selected = false;
 
   List<GamePieceComponent> collisions = [];
+
   late ShapeHitbox hitbox;
   late RectangleComponent border;
   // final _collisionColor = Colors.red;
@@ -118,44 +119,54 @@ class GamePieceComponent extends SpriteComponent with TapCallbacks, DragCallback
     if (!_isdragging) {
       return;
     }
-    for (var t in collisions) {
-      final double mindistance = (width / 2) + (t.width / 2);
-      final double tDistance = distance(t);
-      if (tDistance < mindistance) {
-        //angle of two points, then point that is from t center at angle n to min distance
-        Vector2 newpos = position + event.localDelta;
-        double n = t.angleTo(newpos);
-        double adj = mindistance * cos(n);
-        double opp = mindistance * sin(n);
-        position = Vector2(t.x + opp, t.y - adj);
-        return;
-      } else if (tDistance > mindistance + 5) {
-        collisions.remove(t);
+    bool colliding = false;
+    for (var t in gamePieceBloc.state.tokens) {
+      if (t.spriteComponent != this) {
+        final double mindistance = (width / 2) + (t.spriteComponent.width / 2);
+        final double tDistance = distance(t.spriteComponent);
+
+        if (tDistance < mindistance) {
+          colliding = true;
+          //angle of two points, then point that is from t center at angle n to min distance
+          Vector2 newpos = position + event.localDelta;
+          double n = t.spriteComponent.angleTo(newpos);
+          double adj = mindistance * cos(n);
+          double opp = mindistance * sin(n);
+          position = Vector2(t.spriteComponent.x + opp, t.spriteComponent.y - adj);
+        }
       }
+      // else if (tDistance > mindistance + 5) {
+      //   if (collisions.contains(t)) {
+      //     collisions.remove(t);
+      //   }
+      // }
     }
-    position += event.localDelta;
-  }
-
-  @override
-  void onCollisionStart(Set<Vector2> intersectionPoints, PositionComponent other) {
-    super.onCollisionStart(intersectionPoints, other);
-    print('start');
-    if (other is GamePieceComponent) {
-      collisions.add(other);
-      // hitbox.paint.color = _collisionColor;
+    if (!colliding) {
+      position += event.localDelta;
     }
   }
 
-  @override
-  void onCollisionEnd(PositionComponent other) {
-    super.onCollisionEnd(other);
-    if (other is GamePieceComponent) {
-      // collisions.remove(other);
-    }
-    if (collisions.isEmpty) {
-      // hitbox.paint.color = _defaultColor;
-    }
-  }
+  // @override
+  // void onCollisionStart(Set<Vector2> intersectionPoints, PositionComponent other) {
+  //   super.onCollisionStart(intersectionPoints, other);
+  //   // if (other is GamePieceComponent) {
+  //   //   if (!collisions.contains(other)) {
+  //   //     collisions.add(other);
+  //   //   }
+  //   //   // hitbox.paint.color = _collisionColor;
+  //   // }
+  // }
+
+  // @override
+  // void onCollisionEnd(PositionComponent other) {
+  //   super.onCollisionEnd(other);
+  //   // if (other is GamePieceComponent) {
+  //   //   // collisions.remove(other);
+  //   // }
+  //   // if (collisions.isEmpty) {
+  //   //   // hitbox.paint.color = _defaultColor;
+  //   // }
+  // }
 
   @override
   void onTapUp(TapUpEvent event) {
@@ -166,21 +177,21 @@ class GamePieceComponent extends SpriteComponent with TapCallbacks, DragCallback
   }
 
   void cancelSelect() {
-    setSelected(false);
-    if (collisions.isEmpty) {
-      hitbox.paint.color = _defaultColor;
-    } else {
-      // hitbox.paint.color = _collisionColor;
-    }
+    // setSelected(false);
+    // if (collisions.isEmpty) {
+    //   hitbox.paint.color = _defaultColor;
+    // } else {
+    //   // hitbox.paint.color = _collisionColor;
+    // }
   }
 
   void setSelected(bool value) {
     _selected = value;
     border.setColor(_selected ? Colors.black : _defaultColor);
-    if (collisions.isEmpty) {
-      hitbox.paint.color = _defaultColor;
-    } else {
-      // hitbox.paint.color = _collisionColor;
-    }
+    // if (collisions.isEmpty) {
+    //   hitbox.paint.color = _defaultColor;
+    // } else {
+    //   // hitbox.paint.color = _collisionColor;
+    // }
   }
 }

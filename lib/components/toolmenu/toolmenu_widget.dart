@@ -86,15 +86,17 @@ class _ToolMenuWidgetState extends State<ToolMenuWidget> {
                         selected: false,
                         // status: GamePieceStatus.initial,
                         spriteComponent: GamePieceComponent(
+                          
                           spriteImage: 'token.png',
                           toolMenuBloc: toolMenu,
                           gamePieceBloc: gamePieces,
+                          
                         )
                           ..priority = 50
                           ..width = sizes[randomIndex]
                           ..height = sizes[randomIndex]
                           ..position = Vector2(60, 60)
-                          ..anchor = Anchor.center),
+                          ..anchor = Anchor.center)
                   ));
                 },
                 child: ClipRRect(

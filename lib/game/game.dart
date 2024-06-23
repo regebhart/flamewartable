@@ -10,7 +10,7 @@ import '../bloc/gamepiece/gamepiece_bloc.dart';
 import '../bloc/toolmenu/tool_menu_bloc.dart';
 import '../components/table.dart';
 
-class WartableGame extends FlameGame with ScrollDetector, DragCallbacks, HasCollisionDetection {
+class WartableGame extends FlameGame with ScrollDetector, DragCallbacks {
   WartableGame({required this.toolMenuBloc, required this.gamePieceBloc});
 
   final ToolMenuBloc toolMenuBloc;

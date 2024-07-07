@@ -2,19 +2,24 @@ import 'package:flame/components.dart';
 import 'package:flame/events.dart';
 import 'package:flame/experimental.dart';
 import 'package:flame/extensions.dart';
-import 'package:flame/game.dart';
 import 'package:flame_bloc/flame_bloc.dart';
-import 'package:flutter/material.dart';
+import 'package:flame_forge2d/flame_forge2d.dart';
+import 'package:flamewartable/components/border.dart';
+import 'package:flamewartable/src/config.dart';
+import 'package:flutter/material.dart' hide Draggable;
 
 import '../bloc/gamepiece/gamepiece_bloc.dart';
 import '../bloc/toolmenu/tool_menu_bloc.dart';
 import '../components/table.dart';
 
-class WartableGame extends FlameGame with ScrollDetector, DragCallbacks {
+class WartableGame extends Forge2DGame with ScrollDetector, DragCallbacks, HasCollisionDetection {
   WartableGame({required this.toolMenuBloc, required this.gamePieceBloc});
 
   final ToolMenuBloc toolMenuBloc;
   final GamePieceBloc gamePieceBloc;
+
+  double get width => size.x;
+  double get height => size.y;
 
   // @override
   // bool debugMode = true;
@@ -34,12 +39,15 @@ class WartableGame extends FlameGame with ScrollDetector, DragCallbacks {
   @override
   Future<void> onLoad() async {
     add(FpsTextComponent());
+    world.gravity = Vector2(0, 0);
     world.add(GameTable(gamePieceBloc: gamePieceBloc));
     camera.viewfinder.position = Vector2(0, 0);
     camera.viewfinder.anchor = Anchor.center;
     camera.viewfinder.zoom = 1;
 
-    camera.setBounds(Rectangle.fromCenter(center: Vector2.zero(), size: Vector2.all(650)));
+    camera.setBounds(Rectangle.fromCenter(center: Vector2.zero(), size: Vector2.all(gameHeight / 2)));
+
+    world.addAll(createBoundaries(this));
 
     await add(FlameMultiBlocProvider(
       providers: [
@@ -53,7 +61,7 @@ class WartableGame extends FlameGame with ScrollDetector, DragCallbacks {
         ),
         FlameBlocListener<GamePieceBloc, GamePieceState>(
           onNewState: (state) async {
-            world.add(state.tokens.last.spriteComponent);
+            world.add(state.tokens.last.bodyComponent);
           },
         ),
       ],

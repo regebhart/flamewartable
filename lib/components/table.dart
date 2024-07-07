@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flame/components.dart';
 import 'package:flame/events.dart';
+import 'package:flamewartable/src/config.dart';
 import '../bloc/gamepiece/gamepiece_bloc.dart';
 import '../game/game.dart';
 
@@ -16,7 +17,7 @@ class GameTable extends SpriteComponent with TapCallbacks, HasGameReference<Wart
   @override
   Future<void> onLoad() async {
     sprite = await game.loadSprite('landscape.png');
-    size = Vector2(1219.2, 1219.2);
+    size = Vector2(gameWidth, gameHeight);
     anchor = Anchor.center;
     position = Vector2(0, 0);
 

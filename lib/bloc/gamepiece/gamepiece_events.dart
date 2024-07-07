@@ -19,7 +19,7 @@ final class AddGamePiece extends GamePieceEvent {
 final class GamePieceSelected extends GamePieceEvent {
   const GamePieceSelected({required this.piece, required this.selected});
 
-  final GamePieceComponent piece;
+  final GamePieceBody piece;
   final bool selected;
 
   @override

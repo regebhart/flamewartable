@@ -1,8 +1,7 @@
 import 'dart:math';
 
-import 'package:flame/components.dart';
 import 'package:flamewartable/bloc/gamepiece/gamepiece_bloc.dart';
-import 'package:flamewartable/components/gamepiece_widget.dart';
+import 'package:flamewartable/components/gamepiece_body.dart';
 import 'package:flamewartable/models/gamepiece_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -80,24 +79,16 @@ class _ToolMenuWidgetState extends State<ToolMenuWidget> {
               child: GestureDetector(
                 onTap: () {
                   int randomIndex = Random().nextInt(sizes.length);
-                  
+
                   gamePieces.add(AddGamePiece(
-                    piece: GamePiece(
-                        selected: false,
-                        // status: GamePieceStatus.initial,
-                        spriteComponent: GamePieceComponent(
-                          
-                          spriteImage: 'token.png',
-                          toolMenuBloc: toolMenu,
-                          gamePieceBloc: gamePieces,
-                          
-                        )
-                          ..priority = 50
-                          ..width = sizes[randomIndex]
-                          ..height = sizes[randomIndex]
-                          ..position = Vector2(60, 60)
-                          ..anchor = Anchor.center)
-                  ));
+                      piece: GamePiece(
+                          selected: false,
+                          bodyComponent: GamePieceBody(
+                            diameter: sizes[randomIndex],
+                            spriteImage: 'token.png',
+                            toolMenuBloc: toolMenu,
+                            gamePieceBloc: gamePieces,
+                          ))));
                 },
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(5),

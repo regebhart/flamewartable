@@ -1,5 +1,5 @@
 import 'package:flame/extensions.dart';
-import 'package:flamewartable/components/gamepiece_widget.dart';
+import 'package:flamewartable/components/gamepiece_body.dart';
 import 'package:flamewartable/models/gamepiece_model.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:equatable/equatable.dart';
@@ -20,7 +20,7 @@ class GamePieceBloc extends Bloc<GamePieceEvent, GamePieceState> {
     on<GamePieceSelected>(
       (event, emit) {
         var tokens = state.tokens.toList();
-        var index = tokens.indexWhere((element) => element.spriteComponent == event.piece);
+        var index = tokens.indexWhere((element) => element.bodyComponent == event.piece);
         if (index != -1) {
           tokens[index] = tokens[index].copyWith(selected: event.selected);
         }
@@ -34,7 +34,7 @@ class GamePieceBloc extends Bloc<GamePieceEvent, GamePieceState> {
         for (var index = 0; index < tokens.length; index++) {
           GamePiece token = tokens[index].copyWith();
           //if within area, set true, otherwise false
-          tokens[index] = token.copyWith(selected: event.area.containsPoint(token.spriteComponent.position));
+          tokens[index] = token.copyWith(selected: event.area.containsPoint(token.bodyComponent.position));
         }
         emit(state.copyWith(tokens: tokens));
       },
